@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WoW!</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="script.js"></script>
+</head>
+<body onresize="createAxes()" onload="addAxis()">
+
+<input type="checkbox" id="left-panel-toggle" checked hidden>
+
+<nav class="left-panel">
+</nav>
+<label for="left-panel-toggle" class="left-panel-toggle" onclick="createAxes()"></label>
+
+
+<div class="central-panel">
+
+    <div class="graphic-panel">
+
+    </div>
+    <div class="points-panel">
+        <div style="border: unset;" >
+            Data
+            <input type="number" id="myInput" class="point-input" placeholder="Введите число...">
+            <!--<span onclick="newElement()" class="addBtn">Add</span>-->
+        </div>
+        <br>
+        <div style="border: unset;" class="list">
+            List of values
+            <ul id="list-of-points">
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<input type="checkbox" id="right-panel-toggle" checked hidden>
+
+<nav class="right-panel">
+</nav>
+<label for="right-panel-toggle" class="right-panel-toggle" onclick="createAxes()"></label>
+</body>
+</html>

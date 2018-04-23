@@ -1,0 +1,160 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-grow: 1;
+    position: relative;
+}
+
+.central-panel {
+    width: 1000px;
+    flex-grow: 10;
+    display: flex;
+    margin: 10px 10px 2px;
+}
+
+.points-panel {
+    width: 300px;
+    flex-grow: 0;
+    padding: 11px 6px;
+    position: relative;
+    overflow-y: auto;
+
+}
+
+.graphic-panel {
+    margin-right: 10px;
+    width: 200px;
+    flex-grow: 1;
+}
+
+.central-panel div {
+    border: 1px solid black;
+}
+
+.point-input {
+    width: 100%;
+}
+
+.left-panel, .right-panel {
+    width: 200px;
+    min-width: 200px;
+    height: 100%;
+    position: relative;
+    display: none;
+}
+
+.left-panel-toggle, .right-panel-toggle {
+    position: absolute;
+    top: 50%;
+    cursor: pointer;
+    border: 37px solid transparent;
+    border-right-color: #5078c8;
+    border-left-width: 0;
+}
+
+.left-panel-toggle {
+    left: 0;
+    transform: rotate(180deg);
+}
+
+.right-panel-toggle {
+    right: 0;
+}
+
+#left-panel-toggle, #right-panel-toggle {
+    position: absolute;
+    display: none;
+}
+
+#left-panel-toggle:checked ~ .left-panel-toggle {
+    display: block;
+    left: 200px;
+    margin-left: -37px;
+    overflow-y: auto;
+    transform: rotate(0deg);
+}
+
+#left-panel-toggle:checked ~ .left-panel {
+    display: block;
+    left: 0;
+    box-shadow: 4px 0px 20px 0px rgba(0, 0, 0, 0.5);
+}
+
+#right-panel-toggle:checked ~ .right-panel-toggle {
+    display: block;
+    right: 200px;
+    margin-right: -37px;
+    overflow-y: auto;
+    transform: rotate(180deg);
+}
+
+#right-panel-toggle:checked ~ .right-panel {
+    display: block;
+    right: 0;
+    box-shadow: -4px 0px 20px 0px rgba(0, 0, 0, 0.5);
+}
+
+#list-of-points {
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    height: inherit;
+}
+
+#list-of-points li {
+    position: relative;
+    height: 23px;
+    padding-top: 2px;
+    background: #eee;
+    transition: 0.2s;
+    list-style-type: none;
+    margin-bottom: 4px;
+}
+
+#list-of-points li:nth-child(odd) {
+    background: #f9f9f9;
+}
+
+.close {
+    position: absolute;
+    height: 100%;
+    background-color: silver;
+    border: unset;
+    right: 0;
+    top: 0;
+
+    /*padding: 12px 16px 12px 16px;*/
+}
+
+.close:hover {
+    background-color: #f44336;
+    color: white;
+}
+
+svg path {
+    stroke: steelblue;
+    fill: none;
+    stroke-width: 2;
+}
+
+.axis path, .axis line {
+    fill: none;
+    stroke: #333;
+}
+
+.axis .grid-line {
+    stroke: #000;
+    stroke-opacity: 0.2;
+}
+
+.axis text {
+    font: 10px Verdana;
+}
+
+.dot {
+    stroke: steelblue;
+    fill: lightblue;
+}
+
