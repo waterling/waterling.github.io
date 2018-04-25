@@ -2,89 +2,70 @@ let graphicY;
 let listOfPoints = [];
 let path, svg, dots;
 
+
+function initPage() {
+    addAxis();
+
+    listOfPoints = loadFromStorage();
+    if (!listOfPoints) {
+        listOfPoints = [];
+    }
+    listOfPoints.map((point) => {
+        if (point) {
+            addPoint(point.timeStamp, point.y);
+        }
+    });
+    rewriteAxes(listOfPoints);
+
+    addListeners();
+}
+
 function addAxis() {
     let height = document.getElementsByClassName('graphic-panel')[0].clientHeight,
         width = document.getElementsByClassName('graphic-panel')[0].clientWidth,
         margin = 30;
-// массив точек для создания пути
-    let rawData = [];
-
-    let data = [];
-
-    let minX = Number.MAX_VALUE, maxX = 0, minY = Number.MAX_VALUE, maxY = 0;
-    rawData.map(item => {
-        if (item.timeStamp > maxX) {
-            maxX = item.timeStamp
-        }
-        if (item.timeStamp < minX) {
-            minX = item.timeStamp
-        }
-        if (item.y > maxY) {
-            maxY = item.y
-        }
-        if (item.y < minY) {
-            minY = item.y
-        }
-    });
-
-    let xAxisLength = width - 2 * margin;
     let yAxisLength = height - 2 * margin;
 
     svg = d3.select(".graphic-panel").append("svg")
         .attr("class", "axis")
         .attr("width", width)
         .attr("height", height);
-
-    let scaleX = d3.scale.linear()
-        .domain([0, 1000])
-        .range([0, xAxisLength]);
     let scaleY = d3.scale.linear()
         .domain([100, -100])
         .range([0, yAxisLength]);
-    for (let i = 0; i < rawData.length; i++)
-        data.push({x: scaleX(rawData[i].timeStamp) + margin, y: scaleY(rawData[i].y) + margin})
     let yAxis = d3.svg.axis()
         .scale(scaleY)
         .orient("left");
 
-    // отрисовка оси Y
     graphicY = svg.append("g")
         .attr("class", "y-axis")
-        .attr("transform", // сдвиг оси вниз и вправо на margin
+        .attr("transform",
             "translate(" + margin + "," + margin + ")")
         .call(yAxis);
     let line = d3.svg.line()
-        .x(function (d) {
-            return d.x;
-        })
-        .y(function (d) {
-            return d.y;
-        });
-// добавляем путь
+        .x(d => d.x)
+        .y(d => d.y);
     path = svg.append("g").append("path")
-        .attr("d", line(data))
+        .attr("d", line([]))
         .style("stroke", "steelblue")
         .style("stroke-width", 2);
-
-// добавляем путь
-    addListeners();
-
-
 }
 
-function createAxes() {
-    setTimeout(updateAxes, 0)
+function redrawAxes() {
+    // можно убрать clearInterval (оставить только setTimeout), но график будет выходить за границу блока
+    // а потом перерисовываться
+    setTimeout(clearInterval, 1350, setInterval(updateAxes, 150));
 }
 
 function updateAxes() {
     let height = document.getElementsByClassName('graphic-panel')[0].clientHeight,
         width = document.getElementsByClassName('graphic-panel')[0].clientWidth;
-    svg.transition(100).attr("height", height)
+    svg.attr("height", height)
         .attr("width", width);
     rewriteAxes(listOfPoints);
 }
 
-function rewriteAxes(rawData) {
+function rewriteAxes(rawData, transitionDur = 0) {
     let height = document.getElementsByClassName('graphic-panel')[0].clientHeight,
         width = document.getElementsByClassName('graphic-panel')[0].clientWidth,
         margin = 30;
@@ -115,15 +96,15 @@ function rewriteAxes(rawData) {
     let xAxisLength = width - 2 * margin;
     let yAxisLength = height - 2 * margin;
 
-    svg.attr("class", "axis")
-        .attr("width", width)
+    svg.attr("width", width)
         .attr("height", height);
-    let range = 3;
+    let rangeX = (maxX-minX)*0.05; // чтобы не был график до краев, нужно небольшое смещение
+    let rangeY = (maxY-minY)*0.05; // по 5 процентов со всех краев
     let scaleX = d3.scale.linear()
-        .domain([minX - range * 1000, maxX + range])
+        .domain([minX - rangeX, maxX + rangeX])
         .range([0, xAxisLength]);
     let scaleY = d3.scale.linear()
-        .domain([maxY + range, minY - range])
+        .domain([maxY + rangeY, minY - rangeY])
         .range([0, yAxisLength]);
     for (let i = 0; i < rawData.length; i++)
         data.push({x: scaleX(rawData[i].timeStamp) + margin, y: scaleY(rawData[i].y) + margin})
@@ -131,23 +112,14 @@ function rewriteAxes(rawData) {
         .scale(scaleY)
         .orient("left");
 
-    // отрисовка оси Y
     graphicY
-        .attr("transform", // сдвиг оси вниз и вправо на margin
+        .attr("transform",
             "translate(" + margin + "," + margin + ")")
         .call(yAxis);
     let line = d3.svg.line()
-        .x(function (d) {
-            return d.x;
-        })
-        .y(function (d) {
-            return d.y;
-        });
-// добавляем путь
-    path.transition(10)
-        .attr("d", line(data))
-        .style("stroke", "steelblue")
-        .style("stroke-width", 2);
+        .x(d => d.x)
+        .y(d => d.y);
+    path.transition(transitionDur).attr("d", line(data));
 
     svg.selectAll(".dot").remove();
     svg.selectAll(".dot-text").remove();
@@ -171,33 +143,22 @@ function rewriteAxes(rawData) {
 }
 
 function addListeners() {
-    listOfPoints = loadFromStorage();
-    if (!listOfPoints) {
-        listOfPoints = [];
-    }
-    listOfPoints.map((point) => {
-        if (point) {
-            addPoint(point.timeStamp, point.y);
-        }
-
-    });
-    rewriteAxes(listOfPoints);
-    let myInput = document.getElementById('myInput');
-    myInput.onkeypress = onEnter;
+    let dataInput = document.getElementById('dataInput');
+    dataInput.onkeypress = onEnter;
 }
 
 function onEnter(e) {
     let time = new Date;
-    let inputValue = parseFloat(document.getElementById("myInput").value);
+    let inputValue = parseFloat(document.getElementById("dataInput").value);
     if (e.keyCode === 13 && !isNaN(inputValue)) {
         listOfPoints.push(addPoint(time, inputValue));
         saveInStorage(listOfPoints);
-        rewriteAxes(listOfPoints)
+        rewriteAxes(listOfPoints, 1000);
     }
 }
 
 function isEmpty(obj) {
-    for (var key in obj) {
+    for (let key in obj) {
         return false;
     }
     return true;
@@ -222,23 +183,21 @@ function addPoint(time, inputValue) {
     } else {
         document.getElementById("list-of-points").appendChild(li);
     }
-    document.getElementById("myInput").value = "";
+    document.getElementById("dataInput").value = "";
 
-    let span = document.createElement("button");
-    let txt = document.createTextNode("remove");
-    span.className = "close";
-    span.appendChild(txt);
-    span.style.cursor = 'pointer';
-    li.appendChild(span);
-    span.onclick = removePoint;
+    let button = document.createElement("button");
+    let removeTxt = document.createTextNode("remove");
+    button.className = "remove";
+    button.appendChild(removeTxt);
+    li.appendChild(button);
+    button.onclick = removePoint;
     return {
         timeStamp: +time,
         y: inputValue
     };
 }
 
-function removePoint() {
-    let div = this.parentElement;
+function removeLiPoint(div) {
     div.style.display = "none";
     let point = {
         timeStamp: parseFloat(div.childNodes[0].nodeValue),
@@ -251,7 +210,11 @@ function removePoint() {
 
     });
     listOfPoints.splice(index, 1);
-    saveInStorage(listOfPoints);
-    rewriteAxes(listOfPoints);
 }
 
+function removePoint() {
+    let div = this.parentElement;
+    removeLiPoint(div);
+    saveInStorage(listOfPoints);
+    rewriteAxes(listOfPoints, 1000);
+}

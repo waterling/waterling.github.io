@@ -27,6 +27,7 @@ html, body {
     margin-right: 10px;
     width: 200px;
     flex-grow: 1;
+    overflow: hidden;
 }
 
 .central-panel div {
@@ -38,11 +39,11 @@ html, body {
 }
 
 .left-panel, .right-panel {
-    width: 200px;
-    min-width: 200px;
+    background-color: rgb(234, 234, 234);
+    width: 0;
     height: 100%;
     position: relative;
-    display: none;
+    transition: width 1s, box-shadow 2s;
 }
 
 .left-panel-toggle, .right-panel-toggle {
@@ -56,10 +57,12 @@ html, body {
 
 .left-panel-toggle {
     left: 0;
-    transform: rotate(180deg);
+    transition: left 1s, transform .2s;
+    transform: scaleX(-1);
 }
 
 .right-panel-toggle {
+    transition: right 1s, transform .2s;
     right: 0;
 }
 
@@ -73,27 +76,30 @@ html, body {
     left: 200px;
     margin-left: -37px;
     overflow-y: auto;
+    transition: left 1s, transform .2s;
     transform: rotate(0deg);
 }
 
 #left-panel-toggle:checked ~ .left-panel {
-    display: block;
-    left: 0;
-    box-shadow: 4px 0px 20px 0px rgba(0, 0, 0, 0.5);
+    transition: all 1s;
+    width: 200px;
+    box-shadow: 4px 0 20px 0 rgba(0, 0, 0, 0.5);
 }
 
 #right-panel-toggle:checked ~ .right-panel-toggle {
     display: block;
     right: 200px;
+    transition: right 1s, transform .2s;
     margin-right: -37px;
     overflow-y: auto;
     transform: rotate(180deg);
 }
 
 #right-panel-toggle:checked ~ .right-panel {
-    display: block;
+    transition: width 1s;
+    width: 200px;
     right: 0;
-    box-shadow: -4px 0px 20px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: -4px 0 20px 0 rgba(0, 0, 0, 0.5);
 }
 
 #list-of-points {
@@ -111,32 +117,27 @@ html, body {
     transition: 0.2s;
     list-style-type: none;
     margin-bottom: 4px;
+    color: black;
+    text-align: left;
 }
 
 #list-of-points li:nth-child(odd) {
     background: #f9f9f9;
 }
 
-.close {
+.remove {
     position: absolute;
     height: 100%;
     background-color: silver;
+    cursor: pointer;
     border: unset;
     right: 0;
     top: 0;
-
-    /*padding: 12px 16px 12px 16px;*/
 }
 
-.close:hover {
+.remove:hover {
     background-color: #f44336;
     color: white;
-}
-
-svg path {
-    stroke: steelblue;
-    fill: none;
-    stroke-width: 2;
 }
 
 .axis path, .axis line {
@@ -157,4 +158,3 @@ svg path {
     stroke: steelblue;
     fill: lightblue;
 }
-
